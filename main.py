@@ -127,6 +127,7 @@ class Experiment:
             start_train = time.time()
             model.train()    
             losses = []
+            balances = []
             np.random.shuffle(er_vocab_pairs)
             for j in range(0, len(er_vocab_pairs), self.batch_size):
                 data_batch, targets = self.get_batch(er_vocab, er_vocab_pairs, j)
@@ -145,17 +146,14 @@ class Experiment:
                 losses.append(loss.item())
             if self.decay_rate:
                 scheduler.step()
-            # print(it)
-            # print(time.time()-start_train)    
             print("loss: {:.4f}".format(np.mean(losses)))
+            if args.model2:
+                import pdb
+                pdb.set_trace()
             model.eval()
             with torch.no_grad():
                 if it % 10 == 0:
-                    # print("Validation:")
-                    # self.evaluate(model, d.valid_data)
-                    # if not it%2:
                     print("Test:")
-                    # start_test = time.time()
                     hit10 = self.evaluate(model, d.test_data)
                     if hit10 > best_hit10:
                         best_hit10 = hit10 
