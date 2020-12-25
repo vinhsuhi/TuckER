@@ -94,6 +94,8 @@ class Experiment:
         print('Mean rank: {0}'.format(np.mean(ranks)))
         print('Mean reciprocal rank: {0}'.format(np.mean(1./np.array(ranks))))
 
+        return np.mean(hits[9])
+
 
 
 
@@ -119,7 +121,7 @@ class Experiment:
 
         er_vocab = self.get_er_vocab(train_data_idxs)
         er_vocab_pairs = list(er_vocab.keys())
-
+        best_hit10 = 0
         print("Starting training...")
         for it in range(1, self.num_iterations+1):
             start_train = time.time()
@@ -143,19 +145,22 @@ class Experiment:
                 losses.append(loss.item())
             if self.decay_rate:
                 scheduler.step()
-            print(it)
-            print(time.time()-start_train)    
-            print(np.mean(losses))
+            # print(it)
+            # print(time.time()-start_train)    
+            print("loss: {:.4f}".format(np.mean(losses)))
             model.eval()
             with torch.no_grad():
                 if it % 10 == 0:
-                    print("Validation:")
-                    self.evaluate(model, d.valid_data)
+                    # print("Validation:")
+                    # self.evaluate(model, d.valid_data)
                     # if not it%2:
                     print("Test:")
-                    start_test = time.time()
-                    self.evaluate(model, d.test_data)
-                    print(time.time()-start_test)
+                    # start_test = time.time()
+                    hit10 = self.evaluate(model, d.test_data)
+                    if hit10 > best_hit10:
+                        best_hit10 = hit10 
+                    print("Best hit10: {:.4f}".format(best_hit10))
+                    # print(time.time()-start_test)
            
 
         
