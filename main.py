@@ -105,7 +105,11 @@ class Experiment:
         train_data_idxs = self.get_data_idxs(d.train_data)
         print("Number of training data points: %d" % len(train_data_idxs))
 
-        model = TuckER(d, self.ent_vec_dim, self.rel_vec_dim, **self.kwargs)
+        if args.model2:
+            print("Using model2")
+            model = TuckER_v2(d, self.ent_vec_dim, self.rel_vec_dim, **self.kwargs)
+        else:
+            model = TuckER(d, self.ent_vec_dim, self.rel_vec_dim, **self.kwargs)
         if self.cuda:
             model.cuda()
         model.init()
@@ -181,6 +185,7 @@ if __name__ == '__main__':
                     help="Dropout after the second hidden layer.")
     parser.add_argument("--label_smoothing", type=float, default=0.1, nargs="?",
                     help="Amount of label smoothing.")
+    parser.add_argument("--model2", action="store_true")
 
     args = parser.parse_args()
     dataset = args.dataset
