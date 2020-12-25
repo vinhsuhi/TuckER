@@ -148,9 +148,10 @@ class Experiment:
             print(np.mean(losses))
             model.eval()
             with torch.no_grad():
-                print("Validation:")
-                self.evaluate(model, d.valid_data)
-                if not it%2:
+                if it % 10 == 0:
+                    print("Validation:")
+                    self.evaluate(model, d.valid_data)
+                    # if not it%2:
                     print("Test:")
                     start_test = time.time()
                     self.evaluate(model, d.test_data)
