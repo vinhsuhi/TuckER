@@ -64,8 +64,10 @@ class TuckER_v2(torch.nn.Module):
         self.bn0 = torch.nn.BatchNorm1d(d1)
         self.bn1 = torch.nn.BatchNorm1d(d1)
 
-        self.symmetric_weight1 = torch.nn.Parameter(torch.tensor(np.random.uniform(0, 1, (len(d.relations,))) * 0 + 0.5, dtype=torch.float, device="cuda", requires_grad=True))
-        self.symmetric_weight2 = torch.nn.Parameter(torch.tensor(np.random.uniform(0, 1, (len(d.relations,))) * 0 + 0.5, dtype=torch.float, device="cuda", requires_grad=True))
+
+        self.symmetric_weight1 = torch.nn.Parameter(torch.tensor(np.random.uniform(0, 1, (int(len(d.relations)/2),)) * 0 + 0.5, dtype=torch.float, device="cuda", requires_grad=True))
+        self.symmetric_weight2 = torch.nn.Parameter(torch.tensor(np.random.uniform(0, 1, (int(len(d.relations)/2),)) * 0 + 0.5, dtype=torch.float, device="cuda", requires_grad=True))
+        self.train_sym_weight = True
 
     def init(self):
         xavier_normal_(self.E.weight.data)
@@ -82,10 +84,21 @@ class TuckER_v2(torch.nn.Module):
         W_mat = W_mat.view(-1, e1.size(1), e1.size(1))
         W_mat = self.hidden_dropout1(W_mat)
 
+        r_idx = r_idx/2
+        r_idx = r_idx.long()
+
+        if self.train_sym_weight:
+            self.symmetric_weight1.requires_grad = True
+            self.symmetric_weight2.requires_grad = True
+        else:
+            self.symmetric_weight1.requires_grad = False
+            self.symmetric_weight2.requires_grad = False
+
         term1 = torch.abs(self.symmetric_weight1[r_idx]) / (torch.abs(self.symmetric_weight1[r_idx]) + torch.abs(self.symmetric_weight2[r_idx]))
         term2 = torch.abs(self.symmetric_weight2[r_idx]) / (torch.abs(self.symmetric_weight1[r_idx]) + torch.abs(self.symmetric_weight2[r_idx]))
         term1 = term1.view(len(term1), 1, 1)
         term2 = term2.view(len(term2), 1, 1)
+
 
         W_mat = term1 * W_mat + term2 * W_mat.permute(0, 2, 1)
 

@@ -2,6 +2,7 @@ from load_data import Data
 import numpy as np
 import torch
 import time
+from tqdm import tqdm
 from collections import defaultdict
 from model import *
 from torch.optim.lr_scheduler import ExponentialLR
@@ -123,12 +124,16 @@ class Experiment:
         er_vocab_pairs = list(er_vocab.keys())
         best_hit10 = 0
         print("Starting training...")
-        for it in range(1, self.num_iterations+1):
+        for it in tqdm(range(1, self.num_iterations+1)):
             start_train = time.time()
             model.train()    
             losses = []
             balances = []
             np.random.shuffle(er_vocab_pairs)
+            if it % 10 == 0:
+                model.train_sym_weight = True
+            else:
+                model.train_sym_weight = False
             for j in range(0, len(er_vocab_pairs), self.batch_size):
                 data_batch, targets = self.get_batch(er_vocab, er_vocab_pairs, j)
                 opt.zero_grad()
@@ -146,18 +151,18 @@ class Experiment:
                 losses.append(loss.item())
             if self.decay_rate:
                 scheduler.step()
-            print("loss: {:.4f}".format(np.mean(losses)))
-            if args.model2:
-                import pdb
-                pdb.set_trace()
+            print("Iter: {} loss: {:.4f}".format(it, np.mean(losses)))
             model.eval()
             with torch.no_grad():
-                if it % 10 == 0:
+                if it % 5 == 0 and it>100:
+                    if args.model2:
+                        print("balance params: {}".format(model.symmetric_weight1/model.symmetric_weight2))
                     print("Test:")
                     hit10 = self.evaluate(model, d.test_data)
                     if hit10 > best_hit10:
                         best_hit10 = hit10 
-                    print("Best hit10: {:.4f}".format(best_hit10))
+                        best_e = it
+                    print("Best hit10: {:.4f} Ep: {}".format(best_hit10, best_e))
                     # print(time.time()-start_test)
            
 
