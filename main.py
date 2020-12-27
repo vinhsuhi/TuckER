@@ -95,7 +95,7 @@ class Experiment:
         print('Mean rank: {0}'.format(np.mean(ranks)))
         print('Mean reciprocal rank: {0}'.format(np.mean(1./np.array(ranks))))
 
-        return np.mean(hits[9])
+        return np.mean(hits[9]), np.mean(hits[2]), np.measn(hits[0]), np.mean(ranks), np.mean(1./np.array(ranks))
 
 
 
@@ -125,10 +125,8 @@ class Experiment:
         best_hit10 = 0
         print("Starting training...")
         for it in tqdm(range(1, self.num_iterations+1)):
-            start_train = time.time()
             model.train()    
             losses = []
-            balances = []
             np.random.shuffle(er_vocab_pairs)
             if (it // 100) % 2 == 1:
                 model.train_sym_weight = True 
@@ -154,15 +152,24 @@ class Experiment:
             print("Iter: {} loss: {:.4f}".format(it, np.mean(losses)))
             model.eval()
             with torch.no_grad():
-                if it % 5 == 0 and it > 1000:
+                if it % 5 == 0 and it > 500:
                     if args.model2:
                         print("balance params: {}".format(model.symmetric_weight1/model.symmetric_weight2))
                     print("Test:")
-                    hit10 = self.evaluate(model, d.test_data)
+                    hit10, hit3, hit1, mr, mrr = self.evaluate(model, d.test_data)
                     if hit10 > best_hit10:
                         best_hit10 = hit10 
+                        best_hit3 = hit3 
+                        best_hit1 = hit1 
+                        best_mr = mr 
+                        best_mrr = mrr
                         best_e = it
-                    print("Best hit10: {:.4f} Ep: {}".format(best_hit10, best_e))
+                    print("Best EP: {} Hit10: {:.5f}".format(best_e, best_hit10))
+                    print("Best EP: {} Hit3: {:.5f}".format(best_e, best_hit3))
+                    print("Best EP: {} Hit1: {:.5f}".format(best_e, best_hit1))
+                    print("Best EP: {} MR: {:.5f}".format(best_e, best_mr))
+                    print("Best EP: {} MRR: {:.5f}".format(best_e, best_mrr))
+
                     # print(time.time()-start_test)
            
 
