@@ -92,15 +92,15 @@ class TuckER_v2(torch.nn.Module):
             self.symmetric_weight2.requires_grad = True
 
             self.W.requires_grad = False 
-            self.R.requires_grad = False 
-            self.E.requires_grad = False 
+            # self.R.requires_grad = False 
+            # self.E.requires_grad = False 
         else:
             self.symmetric_weight1.requires_grad = False
             self.symmetric_weight2.requires_grad = False
 
             self.W.requires_grad = True 
-            self.R.requires_grad = True 
-            self.E.requires_grad = True 
+            # self.R.requires_grad = True 
+            # self.E.requires_grad = True 
 
         term1 = torch.abs(self.symmetric_weight1[r_idx]) / (torch.abs(self.symmetric_weight1[r_idx]) + torch.abs(self.symmetric_weight2[r_idx]))
         term2 = torch.abs(self.symmetric_weight2[r_idx]) / (torch.abs(self.symmetric_weight1[r_idx]) + torch.abs(self.symmetric_weight2[r_idx]))

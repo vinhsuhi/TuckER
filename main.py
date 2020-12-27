@@ -154,7 +154,7 @@ class Experiment:
             print("Iter: {} loss: {:.4f}".format(it, np.mean(losses)))
             model.eval()
             with torch.no_grad():
-                if it % 5 == 0 and it>100:
+                if it % 5 == 0 and it > 1000:
                     if args.model2:
                         print("balance params: {}".format(model.symmetric_weight1/model.symmetric_weight2))
                     print("Test:")
