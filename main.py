@@ -95,7 +95,7 @@ class Experiment:
         print('Mean rank: {0}'.format(np.mean(ranks)))
         print('Mean reciprocal rank: {0}'.format(np.mean(1./np.array(ranks))))
 
-        return np.mean(hits[9]), np.mean(hits[2]), np.measn(hits[0]), np.mean(ranks), np.mean(1./np.array(ranks))
+        return np.mean(hits[9]), np.mean(hits[2]), np.mean(hits[0]), np.mean(ranks), np.mean(1./np.array(ranks))
 
 
 
