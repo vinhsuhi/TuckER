@@ -128,10 +128,10 @@ class Experiment:
             model.train()    
             losses = []
             np.random.shuffle(er_vocab_pairs)
-            # if (it // 100) % 2 == 1:
-            #     model.train_sym_weight = True 
-            # else:
-            #     model.train_sym_weight = False 
+            if (it // 100) % 2 == 1:
+                model.train_sym_weight = True 
+            else:
+                model.train_sym_weight = False 
             for j in range(0, len(er_vocab_pairs), self.batch_size):
                 data_batch, targets = self.get_batch(er_vocab, er_vocab_pairs, j)
                 opt.zero_grad()
